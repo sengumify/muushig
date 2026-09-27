@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <title>Муушиг</title>
+  <style>
+    :root{
+      --bg:#f4f6f8;--card:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--accent:#111827;
+      --danger:#b91c1c;--danger-bg:#fef2f2;--ok:#166534;--ok-bg:#f0fdf4;--warn:#92400e;--warn-bg:#fffbeb;
+      --selected:#e0e7ff;--selected-border:#4338ca;--radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{padding-bottom:env(safe-area-inset-bottom)}
+    button,input,select{font:inherit} button{touch-action:manipulation}
+    .app{max-width:760px;margin:0 auto;padding:16px 14px 34px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .brand{font-size:24px;font-weight:900;letter-spacing:-.03em}.small{font-size:13px;color:var(--muted)}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:12px;box-shadow:0 2px 10px rgba(17,24,39,.04)}
+    .section-title{font-size:18px;font-weight:850;margin:0 0 12px}.field{display:grid;gap:6px;margin-bottom:12px}label{font-weight:700}
+    input[type="text"],input[type="number"],select{width:100%;padding:12px 13px;border:1px solid #cfd4dc;border-radius:12px;background:#fff;color:var(--text);outline:none;font-size:16px}
+    input:focus,select:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+    .players-list{display:grid;gap:8px}.player-input-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:8px;align-items:center}
+    .avatar{width:44px;height:44px;border-radius:50%;overflow:hidden;background:#e5e7eb;display:grid;place-items:center;flex:0 0 auto;font-weight:900;color:#4b5563;border:1px solid #d1d5db}.avatar img{width:100%;height:100%;object-fit:cover;display:block}.avatar.game-avatar{width:46px;height:46px}.avatar.table-avatar{width:24px;height:24px;font-size:10px;display:inline-grid;vertical-align:middle;margin-right:5px}.photo-label{position:relative;overflow:hidden;white-space:nowrap}.photo-label input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}.player-identity{display:flex;align-items:center;gap:10px}.table-player{display:inline-flex;align-items:center}.terminate-link{display:block;margin:9px auto 0;border:0;background:transparent;color:#9ca3af;font-size:12px;text-decoration:underline;text-underline-offset:3px;padding:5px 8px;cursor:pointer}.terminate-link:hover{color:#991b1b}
+    .btn{border:none;border-radius:12px;padding:12px 14px;font-weight:780;cursor:pointer;background:#eef0f3;color:#111827}.btn:disabled{opacity:.42;cursor:not-allowed}
+    .btn.primary{background:var(--accent);color:#fff}.btn.danger{background:#fee2e2;color:#991b1b}.btn.ghost{background:transparent;border:1px solid var(--line)}
+    .btn.full{width:100%}.btn.large{padding:15px 16px;font-size:17px;border-radius:14px}.btn.slim{padding:8px 10px;font-size:12px}
+    .checkbox-row{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-top:1px solid var(--line)}.checkbox-row:first-of-type{border-top:none}
+    .checkbox-row input{width:20px;height:20px;margin-top:1px}.checkbox-title{font-weight:760}.checkbox-help{font-size:13px;color:var(--muted);margin-top:3px;line-height:1.4}
+    .hidden{display:none!important}
+    .game-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.meta-box{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+    .meta-label{font-size:11px;color:var(--muted)}.meta-value{font-size:17px;font-weight:850;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .player-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}.player-card.dealer{border-color:#9ca3af;box-shadow:0 0 0 2px rgba(17,24,39,.05)}
+    .player-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:12px}.player-name{font-size:18px;font-weight:850}.dealer-badge{display:inline-block;margin-left:6px;font-size:11px;background:#111827;color:#fff;padding:3px 7px;border-radius:999px;vertical-align:2px}
+    .score{font-size:28px;font-weight:900;line-height:1}.score-label{font-size:12px;color:var(--muted);text-align:right;margin-top:3px}.status{font-size:12px;color:var(--warn);font-weight:700;margin-top:5px}
+    .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.action-btn{min-height:47px;border:1px solid #d8dde5;background:#f8fafc;border-radius:12px;font-weight:800;font-size:15px;padding:8px 5px;color:#111827}
+    .action-btn.selected{background:var(--selected);border-color:var(--selected-border);color:#312e81}.action-btn.fold{grid-column:span 2}.action-btn.bust{grid-column:span 2}
+    .submit-zone{background:#fff;border:1px solid var(--line);border-radius:18px;padding:13px;margin-top:12px;box-shadow:0 3px 16px rgba(17,24,39,.05)}
+    .submit-line{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.pill{border-radius:999px;padding:6px 9px;font-size:12px;font-weight:800;background:#eef2ff;color:#3730a3}.pill.bad{background:#fee2e2;color:#991b1b}
+    .notice{padding:11px 12px;border-radius:12px;margin:10px 0;font-size:14px;line-height:1.45}.notice.warn{background:var(--warn-bg);color:var(--warn)}.notice.error{background:var(--danger-bg);color:var(--danger)}.notice.ok{background:var(--ok-bg);color:var(--ok)}
+    .footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.balance-list,.settlement-list,.wins-list{display:grid;gap:8px}
+    .balance-row,.settlement-row,.wins-row{display:flex;justify-content:space-between;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}.positive{color:var(--ok);font-weight:800}.negative{color:var(--danger);font-weight:800}.zero{color:var(--muted);font-weight:700}
+    .summary-box{width:100%;min-height:220px;border:1px solid var(--line);border-radius:14px;padding:13px;background:#fafafa;white-space:pre-wrap;line-height:1.5}.tiny{font-size:12px;color:var(--muted);line-height:1.45}
+    .modal-wrap{position:fixed;inset:0;background:rgba(17,24,39,.54);display:flex;align-items:flex-end;justify-content:center;z-index:30;padding:16px}.modal{width:min(100%,680px);max-height:88vh;overflow:auto;background:#fff;border-radius:22px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+    .modal h2{margin:0 0 8px;font-size:21px}.modal p{margin:0 0 14px;color:var(--muted);line-height:1.45}.candidate-list{display:grid;gap:8px}
+
+    /* Scoreboard: full table by default, compact optional */
+    .scoreboard-dock{position:fixed;left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));z-index:12;max-width:740px;margin:0 auto;background:rgba(255,255,255,.98);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:18px;padding:10px;box-shadow:0 12px 34px rgba(17,24,39,.18)}
+    .scoreboard-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.scoreboard-title strong{font-size:14px}.scoreboard-controls{display:flex;align-items:center;gap:6px}
+    .scoreboard-table-wrap{max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:12px}.scoreboard-table{width:100%;border-collapse:collapse;font-size:13px}.scoreboard-table th,.scoreboard-table td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}.scoreboard-table th{position:sticky;top:0;background:#f8fafc;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.03em}.scoreboard-table tr:last-child td{border-bottom:none}.scoreboard-table th:first-child{left:0;z-index:3}.scoreboard-table td:first-child{position:sticky;left:0;background:#fff;z-index:2}.scoreboard-table td.num{text-align:right;font-weight:850}.scoreboard-table .dealer-row td:first-child{font-weight:850}
+    .scoreboard-compact{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none}.scoreboard-compact::-webkit-scrollbar{display:none}.score-chip{flex:0 0 auto;min-width:82px;border:1px solid var(--line);border-radius:12px;padding:7px 9px;background:#f8fafc}.score-chip-name{font-size:12px;color:var(--muted);max-width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.score-chip-value{font-size:21px;font-weight:900;line-height:1.05;margin-top:2px}
+    body.game-active .app{max-width:none;width:100%}body.game-active .scoreboard-dock{max-width:none}body.game-active.score-expanded .app{padding-bottom:330px}body.game-active.score-compact .app{padding-bottom:145px}
+
+    @media (min-width:600px){.actions{grid-template-columns:repeat(8,1fr)}.action-btn.fold,.action-btn.bust{grid-column:span 1}}
+    @media (orientation:landscape){
+      :root{--scoreboard-landscape-w:clamp(360px,43vw,820px)}
+      body.game-active .app{width:auto;max-width:none;margin:0 var(--scoreboard-landscape-w) 0 0;padding:10px 8px 28px 12px!important}
+      body.game-active #gameView{width:100%;min-height:calc(100vh - 70px)}
+      .scoreboard-dock{left:auto;right:8px;top:8px;bottom:8px;width:calc(var(--scoreboard-landscape-w) - 16px);max-width:none;margin:0;display:flex;flex-direction:column;padding:12px}
+      .scoreboard-table-wrap{max-height:none;flex:1}.scoreboard-table{font-size:13px}.scoreboard-compact{display:grid;grid-template-columns:1fr;gap:7px;overflow-y:auto;overflow-x:hidden;flex:1}.score-chip{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0;padding:9px 10px}.score-chip-name{font-size:13px;max-width:240px;color:var(--text);font-weight:750}.score-chip-value{font-size:22px;margin:0}
+    }
+    @media (max-width:520px){.game-meta{grid-template-columns:repeat(2,1fr)}.photo-label{font-size:0;padding:8px 10px}.photo-label::before{content:"📷";font-size:16px}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div><div class="brand">🃏 Муушиг</div></div>
+    <button class="btn ghost hidden" id="editNamesBtn">Нэр засах</button>
+  </div>
+
+  <section id="setupView">
+    <div class="card">
+      <h1 class="section-title">Тоглогчид</h1>
+      <div id="playersList" class="players-list"></div>
+      <button class="btn ghost full" id="addPlayerBtn" style="margin-top:9px">+ Тоглогч нэмэх</button>
+    </div>
+    <div class="card">
+      <h2 class="section-title">Тоглолтын тохиргоо</h2>
+      <div class="field"><label id="bidLabel" for="bidInput">Үндсэн бооцоо / 1 онооны үнэ</label><input id="bidInput" type="number" inputmode="numeric" min="1" step="1" value="10000"></div>
+      <div class="checkbox-row"><input id="wholeBidCheck" type="checkbox"><div><div class="checkbox-title">Бүхэл бооцоо</div><div class="checkbox-help">Идэвхгүй үед хожигч бүрийн төлбөр = гараа дуусах үеийн үлдсэн оноо × бооцоо. Идэвхжүүлбэл хожигч бүр онооноос үл хамааран бооцооны дүнг нэг удаа төлнө.</div></div></div>
+      <div class="field"><label for="bustPointsInput">“Үсэрсэн” үед нэмэх оноо</label><input id="bustPointsInput" type="number" inputmode="numeric" min="1" step="1" value="5"></div>
+      <div class="field"><label for="firstDealerSelect">Эхний гарааны ажил</label><select id="firstDealerSelect"></select></div>
+      <div class="checkbox-row"><input id="exactZeroCheck" type="checkbox"><div><div class="checkbox-title">Яг 0 болж байж хожно</div><div class="checkbox-help">0-ээс доош оруулах хасалт сонгогдвол тухайн ээлж эхлэх үеийн оноон дээр “Үсэрсэн” оноо нэмэгдэнэ.</div></div></div>
+      <div class="checkbox-row"><input id="maxFoldCheck" type="checkbox"><div><div class="checkbox-title">Дараалан хамгийн ихдээ 3 удаа өнжинө</div><div class="checkbox-help">3 дахь дараалсан өнжилтийн дараа дараагийн ээлжид “Өнжсөн” товч идэвхгүй болно.</div></div></div>
+      <div class="checkbox-row"><input id="oneNoFoldCheck" type="checkbox"><div><div class="checkbox-title">1 оноотой тоглогч дараагийн ээлжид өнжихгүй</div><div class="checkbox-help">Ээлж дуусахад яг 1 оноотой бол дараагийн ээлжид “Өнжсөн” товч идэвхгүй болно.</div></div></div>
+      <div class="checkbox-row"><input id="extraGamesCheck" type="checkbox" checked><div><div class="checkbox-title">Боолт</div><div class="checkbox-help">Үндсэн гарааны тоо тоглогчдын тоотой тэнцүү. Тэдгээр дууссаны дараа 0 хожилтой тоглогчдын тоотой тэнцүү хүртэл Боолт тоглох боломжтой.</div></div></div>
+    </div>
+    <div id="setupError" class="notice error hidden"></div>
+    <button class="btn primary large full" id="startSessionBtn">Тоглолт эхлүүлэх</button>
+    
+  </section>
+
+  <section id="gameView" class="hidden">
+    <div class="game-meta">
+      <div class="meta-box"><div class="meta-label">Гараа</div><div class="meta-value" id="gameNo"></div></div>
+      <div class="meta-box"><div class="meta-label">Ээлж</div><div class="meta-value" id="roundNo"></div></div>
+      <div class="meta-box"><div class="meta-label">Бооцоо</div><div class="meta-value" id="bidDisplay"></div></div>
+      <div class="meta-box"><div class="meta-label">Ажил</div><div class="meta-value" id="dealerDisplay"></div></div>
+    </div>
+    <div id="phaseBanner"></div><div id="roundNotice"></div><div id="gamePlayers"></div>
+    <div class="submit-zone">
+      <div class="submit-line"><strong>Энэ ээлжид хасагдах нийт оноо</strong><span id="deductionTotal" class="pill">0 / 5</span></div>
+      <button id="submitRoundBtn" class="btn primary large full">Ээлж оруулах</button>
+      <button id="terminateSessionBtn" class="terminate-link">Нийт тоглолтыг шууд дуусгах</button>
+    </div>
+
+    <aside id="scoreboardDock" class="scoreboard-dock">
+      <div class="scoreboard-title"><strong>Онооны хүснэгт</strong><div class="scoreboard-controls"><button id="scoreToggleBtn" class="btn ghost slim">Хураах</button></div></div>
+      <div id="scoreboardFull" class="scoreboard-table-wrap"><table class="scoreboard-table"><thead id="scoreboardHead"></thead><tbody id="scoreboardTableBody"></tbody></table></div>
+      <div id="scoreboardCompact" class="scoreboard-compact hidden"></div>
+    </aside>
+  </section>
+
+  <section id="betweenView" class="hidden">
+    <div class="card"><div class="small" id="endedGameLabel">Гараа дууслаа</div><h2 class="section-title" id="winnerTitle" style="margin-top:5px"></h2><div id="gameResultText" class="notice ok"></div></div>
+    <div class="card"><h2 class="section-title">Гарааны хүснэгт</h2><div id="endedGameTable" class="scoreboard-table-wrap"></div></div>
+    <div class="card"><h2 class="section-title">Одоогийн үлдэгдэл</h2><div id="balances"></div></div>
+    <div id="nextActionCard" class="card"></div>
+  </section>
+
+  <section id="settlementView" class="hidden">
+    <div class="card"><div class="small">Нийт тоглолт дууслаа</div><h2 class="section-title" style="margin-top:5px">Эцсийн тооцоо</h2><div id="sessionStats"></div></div>
+    <div class="card"><h2 class="section-title">Хамгийн цөөн шилжүүлгээр төлөх</h2><div id="settlements"></div></div>
+    <div class="card"><h2 class="section-title">Групп чат руу явуулах текст</h2><div id="summaryText" class="summary-box"></div><button id="copySummaryBtn" class="btn primary full" style="margin-top:9px">Текст хуулах</button></div>
+    <button id="newSessionBtn" class="btn danger full">Шинэ тоглолт</button>
+  </section>
+</div>
+
+<div id="winnerModal" class="modal-wrap hidden"><div class="modal"><h2>Хэн түрүүлж хожсон бэ?</h2><p>Энэ ээлжид олон тоглогч хожих нөхцөлд хүрлээ. Бодит тоглолт дээр хамгийн түрүүнд хожсон тоглогчийг сонгоно уу.</p><div id="winnerCandidates" class="candidate-list"></div></div></div>
+<div id="confirmModal" class="modal-wrap hidden"><div class="modal"><h2 id="confirmTitle">Баталгаажуулах</h2><p id="confirmText"></p><div class="footer-actions"><button id="confirmCancel" class="btn ghost">Болих</button><button id="confirmOk" class="btn danger">Тийм</button></div></div></div>
+<div id="editNamesModal" class="modal-wrap hidden"><div class="modal"><h2>Тоглогчдын нэр засах</h2><p>Тоглогч солигдсон бол нэрийг нь өөрчилж болно. Өмнөх өр, хожил, оноо тухайн байрлалтайгаа үргэлжилнэ.</p><div id="editNamesList" class="players-list"></div><div id="editNamesError" class="notice error hidden"></div><div class="footer-actions"><button id="editNamesCancel" class="btn ghost">Болих</button><button id="editNamesSave" class="btn primary">Хадгалах</button></div></div></div>
+
+<script>
+(() => {
+  "use strict";
+  const STORAGE_KEY = "khozriin_onoo_session_v1";
+  const $ = id => document.getElementById(id);
+  let setupNames = ["", "", "", ""];
+  let setupPhotos = [null, null, null, null];
+  let editPhotoDraft = {};
+  let state = null, confirmAction = null;
+
+  const uid = () => Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+  const money = n => new Intl.NumberFormat("mn-MN",{maximumFractionDigits:0}).format(n)+" ₮";
+  const escapeHtml = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+
+  function initials(name){return String(name||"?").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()||"?"}
+  function avatarHtml(player,extraClass=""){const cls=`avatar ${extraClass}`.trim();return player?.photo?`<span class="${cls}"><img src="${escapeHtml(player.photo)}" alt=""></span>`:`<span class="${cls}">${escapeHtml(initials(player?.name))}</span>`}
+  function compressPhoto(file){return new Promise((resolve,reject)=>{if(!file)return resolve(null);const reader=new FileReader();reader.onerror=()=>reject(reader.error);reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error("Зураг уншиж чадсангүй"));img.onload=()=>{const size=220,canvas=document.createElement("canvas");canvas.width=size;canvas.height=size;const ctx=canvas.getContext("2d"),side=Math.min(img.naturalWidth,img.naturalHeight),sx=(img.naturalWidth-side)/2,sy=(img.naturalHeight-side)/2;ctx.drawImage(img,sx,sy,side,side,0,0,size,size);resolve(canvas.toDataURL("image/jpeg",0.72))};img.src=reader.result};reader.readAsDataURL(file)})}
+  let audioCtx=null;
+  function playCashRegisterSfx(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioCtx=audioCtx||new AC();const run=()=>{const now=audioCtx.currentTime;[[0,880,.055,"square",.055],[.06,1318.51,.13,"sine",.10],[.13,1760,.18,"sine",.075]].forEach(([delay,freq,dur,type,vol])=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,now+delay);g.gain.setValueAtTime(.0001,now+delay);g.gain.exponentialRampToValueAtTime(vol,now+delay+.008);g.gain.exponentialRampToValueAtTime(.0001,now+delay+dur);o.connect(g).connect(audioCtx.destination);o.start(now+delay);o.stop(now+delay+dur+.02)})};if(audioCtx.state==="suspended")audioCtx.resume().then(run).catch(()=>{});else run()}catch(e){console.debug("SFX unavailable",e)}}
+
+  function blankState(){return{version:4,sessionStarted:false,sessionFinished:false,terminatedEarly:false,createdAt:null,finishedAt:null,settings:{exactZero:false,maxThreeFolds:false,noFoldAtOne:false,bustPoints:5,extraGames:true,wholeBid:false},initialBid:10000,players:[],balances:{},wins:{},initialWins:{},initialGameLimit:0,phase:"initial",extraEligibleDealerIds:[],usedExtraDealerIds:[],extraGameLimit:0,currentGame:null,history:[],settlement:[],ui:{scoreboardExpanded:true}}}
+
+  function migrate(parsed){
+    if(!parsed||!parsed.sessionStarted)return null;
+    const oldVersion=Number(parsed.version||1),s=blankState();
+    Object.assign(s,parsed);s.version=4;s.settings={...blankState().settings,...(parsed.settings||{})};s.ui={...blankState().ui,...(parsed.ui||{})};
+    s.initialBid=parsed.initialBid||parsed.bid||10000;s.players=(parsed.players||[]).map(p=>({...p,photo:p.photo||null}));s.initialGameLimit=parsed.initialGameLimit||s.players.length;s.phase=parsed.phase||"initial";
+    s.balances=parsed.balances||{};s.wins=parsed.wins||{};s.initialWins=parsed.initialWins||{};s.history=parsed.history||[];s.extraEligibleDealerIds=parsed.extraEligibleDealerIds||[];s.usedExtraDealerIds=parsed.usedExtraDealerIds||[];s.extraGameLimit=parsed.extraGameLimit||0;s.terminatedEarly=!!parsed.terminatedEarly;
+    s.players.forEach(p=>{if(s.balances[p.id]==null)s.balances[p.id]=0;if(s.wins[p.id]==null)s.wins[p.id]=0;if(s.initialWins[p.id]==null)s.initialWins[p.id]=0});
+    if(oldVersion<3)s.settings.wholeBid=true;
+    const hadInitialWins=parsed.initialWins&&Object.keys(parsed.initialWins).length;
+    if(!hadInitialWins)s.players.forEach(p=>s.initialWins[p.id]=0);
+    s.history.forEach((h,i)=>{h.phase=h.phase||"initial";h.phaseNumber=h.phaseNumber||i+1;h.startingDealerId=h.startingDealerId||h.dealerId||(s.players[0]?.id||null);(h.rounds||[]).forEach((r,ri)=>{if(!r.dealerId)r.dealerId=rotatedPlayerId(s,h.startingDealerId,ri)});if(!hadInitialWins&&h.phase==="initial"&&h.winnerId)s.initialWins[h.winnerId]=(s.initialWins[h.winnerId]||0)+1});
+    if(s.currentGame){s.currentGame.phase=s.currentGame.phase||"initial";s.currentGame.phaseNumber=s.currentGame.phaseNumber||Math.min(s.history.length+1,s.initialGameLimit);s.currentGame.startingDealerId=s.currentGame.startingDealerId||s.currentGame.dealerId||(s.players[0]?.id||null);(s.currentGame.roundHistory||[]).forEach((r,ri)=>{if(!r.dealerId)r.dealerId=rotatedPlayerId(s,s.currentGame.startingDealerId,ri)});s.currentGame.dealerId=s.currentGame.dealerId||rotatedPlayerId(s,s.currentGame.startingDealerId,Math.max(0,(s.currentGame.round||1)-1));}
+    return s;
+  }
+
+  function rotatedPlayerId(st,startId,steps){
+    const players=st?.players||[];if(!players.length)return null;
+    const idx=players.findIndex(p=>p.id===startId),base=idx<0?0:idx;
+    return players[(base+(steps%players.length)+players.length)%players.length].id;
+  }
+
+  function save(){if(!state||!state.sessionStarted)return;localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+  function load(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return false;state=migrate(JSON.parse(raw));return!!state}catch(e){console.error(e);return false}}
+
+  function showView(id){["setupView","gameView","betweenView","settlementView"].forEach(v=>$(v).classList.add("hidden"));$(id).classList.remove("hidden");document.body.classList.toggle("game-active",id==="gameView");$("editNamesBtn").classList.toggle("hidden",id==="setupView"||id==="settlementView");syncScoreboardBodyClass()}
+  function syncScoreboardBodyClass(){const ex=state?.ui?.scoreboardExpanded!==false;document.body.classList.toggle("score-expanded",ex);document.body.classList.toggle("score-compact",!ex)}
+
+  function renderSetup(){
+    showView("setupView");while(setupPhotos.length<setupNames.length)setupPhotos.push(null);const list=$("playersList");list.innerHTML="";
+    setupNames.forEach((name,i)=>{const row=document.createElement("div");row.className="player-input-row";const temp={name:name||`Т${i+1}`,photo:setupPhotos[i]};row.innerHTML=`${avatarHtml(temp,"setup-avatar")}<input type="text" maxlength="30" placeholder="Тоглогч ${i+1}-ийн нэр" value="${escapeHtml(name)}" data-player-index="${i}"><label class="btn ghost slim photo-label">📷 Зураг<input type="file" accept="image/*" capture="user" data-player-photo="${i}"></label><button class="btn danger remove-player" data-remove-player="${i}" ${setupNames.length<=2?"disabled":""}>×</button>`;list.appendChild(row)});
+    list.querySelectorAll("[data-player-index]").forEach(inp=>inp.addEventListener("input",e=>{setupNames[Number(e.target.dataset.playerIndex)]=e.target.value;refreshDealerOptions()}));
+    list.querySelectorAll("[data-player-photo]").forEach(inp=>inp.addEventListener("change",async e=>{const i=Number(e.target.dataset.playerPhoto),file=e.target.files?.[0];if(!file)return;try{setupPhotos[i]=await compressPhoto(file);renderSetup()}catch{alert("Зургийг боловсруулахад алдаа гарлаа.")}}));
+    list.querySelectorAll("[data-remove-player]").forEach(btn=>btn.addEventListener("click",e=>{const i=Number(e.currentTarget.dataset.removePlayer);setupNames.splice(i,1);setupPhotos.splice(i,1);renderSetup()}));refreshDealerOptions()
+  }
+
+  function refreshDealerOptions(){const sel=$("firstDealerSelect");if(!sel)return;const prev=sel.value,names=setupNames.map(s=>s.trim()).filter(Boolean);sel.innerHTML="";if(!names.length){const opt=document.createElement("option");opt.value="0";opt.textContent="Тоглогчдын нэрээ эхлээд оруулна уу";sel.appendChild(opt);sel.disabled=true;return}sel.disabled=false;names.forEach((n,i)=>{const opt=document.createElement("option");opt.value=String(i);opt.textContent=n;sel.appendChild(opt)});if([...sel.options].some(o=>o.value===prev))sel.value=prev}
+
+  function startSession(){
+    const entries=setupNames.map((name,i)=>({name:name.trim(),photo:setupPhotos[i]||null})).filter(x=>x.name),names=entries.map(x=>x.name),lower=names.map(n=>n.toLocaleLowerCase("mn-MN")),bid=Math.floor(Number($("bidInput").value)),bust=Math.floor(Number($("bustPointsInput").value));const errors=[];
+    if(names.length<2)errors.push("Хамгийн багадаа 2 тоглогч оруулна уу.");if(new Set(lower).size!==lower.length)errors.push("Тоглогчдын нэр давхцахгүй байх ёстой.");if(!Number.isFinite(bid)||bid<=0)errors.push("Бооцоог 0-ээс их бүхэл тоогоор оруулна уу.");if(!Number.isFinite(bust)||bust<=0)errors.push("“Үсэрсэн” оноог 0-ээс их бүхэл тоогоор оруулна уу.");
+    if(errors.length){$("setupError").textContent=errors.join(" ");$("setupError").classList.remove("hidden");return}$("setupError").classList.add("hidden");
+    state=blankState();state.sessionStarted=true;state.createdAt=new Date().toISOString();state.initialBid=bid;state.settings={exactZero:$("exactZeroCheck").checked,maxThreeFolds:$("maxFoldCheck").checked,noFoldAtOne:$("oneNoFoldCheck").checked,bustPoints:bust,extraGames:$("extraGamesCheck").checked,wholeBid:$("wholeBidCheck").checked};state.players=entries.map(x=>({id:uid(),name:x.name,photo:x.photo}));state.initialGameLimit=state.players.length;state.players.forEach(p=>{state.balances[p.id]=0;state.wins[p.id]=0;state.initialWins[p.id]=0});
+    const dealerIndex=Math.min(Number($("firstDealerSelect").value)||0,state.players.length-1);startNewGame({phase:"initial",bid:state.initialBid,dealerId:state.players[dealerIndex].id});save();render();
+  }
+
+  function phaseHistoryCount(phase){return state.history.filter(h=>h.phase===phase).length}
+  function startNewGame({phase,bid,dealerId}){const ps={};state.players.forEach(p=>ps[p.id]={score:15,foldStreak:0,action:null});state.phase=phase;state.currentGame={number:state.history.length+1,phase,phaseNumber:phaseHistoryCount(phase)+1,round:1,bid,startingDealerId:dealerId,dealerId,finished:false,winnerId:null,pendingWinnerCandidates:[],players:ps,roundHistory:[],notices:[]};save()}
+  function render(){if(!state||!state.sessionStarted)return renderSetup();if(state.sessionFinished)return renderSettlement();if(state.currentGame?.finished)return renderBetween();renderGame()}
+  function playerById(id){return state.players.find(p=>p.id===id)}
+  function orderedPlayersForDealer(dealerId){const idx=state.players.findIndex(p=>p.id===dealerId);if(idx<0)return state.players.slice();return state.players.slice(idx).concat(state.players.slice(0,idx))}
+  function nextSeatId(id){return rotatedPlayerId(state,id,1)}
+
+  function foldBlockReasons(pid){const gp=state.currentGame.players[pid],r=[];if(state.settings.maxThreeFolds&&gp.foldStreak>=3)r.push("3 удаа дараалан өнжсөн");if(state.settings.noFoldAtOne&&gp.score===1)r.push("1 оноотой");return r}
+  function prospectiveDeduction(pid,a){if(!a||a.type!=="deduct")return 0;const gp=state.currentGame.players[pid],k=a.value;if(state.settings.exactZero&&gp.score-k<0)return 0;return k}
+  function pendingDeductionTotal(){return state.players.reduce((sum,p)=>sum+prospectiveDeduction(p.id,state.currentGame.players[p.id].action),0)}
+  function actionLabel(a,pid){if(!a)return "—";if(a.type==="fold")return "Өнжсөн";if(a.type==="bust")return "Үсэрсэн";if(a.type==="deduct"){const gp=state.currentGame.players[pid];if(state.settings.exactZero&&gp.score-a.value<0)return "Үсэрсэн*";return `-${a.value}`}return "—"}
+
+  function renderGame(){
+    showView("gameView");const g=state.currentGame,order=state.players.slice();$("gameNo").textContent=g.phase==="extra"?`Боолт ${g.phaseNumber}`:`${g.phaseNumber}/${state.initialGameLimit}`;$("roundNo").textContent=g.round;$("bidDisplay").textContent=state.settings.wholeBid?money(g.bid):`${money(g.bid)} / оноо`;$("dealerDisplay").textContent=playerById(g.dealerId)?.name||"—";
+    $("phaseBanner").innerHTML=g.phase==="extra"?`<div class="notice warn"><strong>Боолт</strong> · ${g.phaseNumber}/${state.extraGameLimit}</div>`:"";
+    const notice=$("roundNotice");notice.innerHTML="";if(g.notices?.length){const box=document.createElement("div");box.className="notice warn";box.innerHTML=g.notices.map(x=>"• "+escapeHtml(x)).join("<br>");notice.appendChild(box)}
+    const wrap=$("gamePlayers");wrap.innerHTML="";order.forEach(p=>{const gp=g.players[p.id],blocked=foldBlockReasons(p.id),key=gp.action?(gp.action.type==="deduct"?"d"+gp.action.value:gp.action.type):"",auto=state.settings.exactZero&&gp.action?.type==="deduct"&&gp.score-gp.action.value<0,card=document.createElement("div");card.className="player-card"+(p.id===g.dealerId?" dealer":"");card.innerHTML=`<div class="player-head"><div class="player-identity">${avatarHtml(p,"game-avatar")}<div><div class="player-name">${escapeHtml(p.name)}${p.id===g.dealerId?'<span class="dealer-badge">Ажил</span>':""}</div>${blocked.length?`<div class="status">Өнжих боломжгүй: ${escapeHtml(blocked.join(", "))}</div>`:""}${auto?`<div class="status">0-ээс доош орох тул “Үсэрсэн” болно.</div>`:""}</div></div><div><div class="score">${gp.score}</div><div class="score-label">оноо</div></div></div><div class="actions"><button class="action-btn fold ${key==="fold"?"selected":""}" data-action="fold" data-pid="${p.id}" ${blocked.length?"disabled":""}>Өнжсөн</button>${[1,2,3,4,5].map(k=>`<button class="action-btn ${key==="d"+k?"selected":""}" data-action="deduct" data-value="${k}" data-pid="${p.id}">-${k}</button>`).join("")}<button class="action-btn bust ${key==="bust"?"selected":""}" data-action="bust" data-pid="${p.id}">Үсэрсэн</button></div>`;wrap.appendChild(card)});
+    wrap.querySelectorAll("[data-action]").forEach(btn=>btn.addEventListener("click",()=>{const pid=btn.dataset.pid,type=btn.dataset.action;const a={type};if(type==="deduct")a.value=Number(btn.dataset.value);state.currentGame.players[pid].action=a;state.currentGame.notices=[];save();renderGame()}));
+    renderScoreboard(order);const total=pendingDeductionTotal();$("deductionTotal").textContent=`${total} / 5`;$("deductionTotal").classList.toggle("bad",total>5)
+  }
+
+  function renderScoreboard(order){
+    const g=state.currentGame,head=$("scoreboardHead"),tbody=$("scoreboardTableBody"),compact=$("scoreboardCompact");
+    const columns=state.players.slice();
+    head.innerHTML=`<tr><th>Ажил</th><th>Ээлж</th>${columns.map(p=>`<th><span class="table-player">${avatarHtml(p,"table-avatar")}${escapeHtml(p.name)}</span></th>`).join("")}</tr>`;
+    tbody.innerHTML="";compact.innerHTML="";
+    (g.roundHistory||[]).forEach(r=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`<td>${escapeHtml(playerById(r.dealerId)?.name||"—")}</td><td class="num">${r.round}</td>${columns.map(p=>`<td class="num">${r.results?.[p.id]?.endScore ?? "—"}</td>`).join("")}`;
+      tbody.appendChild(tr);
+    });
+    if(!(g.roundHistory||[]).length){const tr=document.createElement("tr");tr.innerHTML=`<td colspan="${columns.length+2}" class="small">Одоогоор дууссан ээлж байхгүй.</td>`;tbody.appendChild(tr)}
+    state.players.forEach(p=>{const gp=g.players[p.id],chip=document.createElement("div");chip.className="score-chip";chip.innerHTML=`<div class="score-chip-name"><span style="display:inline-flex;align-items:center">${avatarHtml(p,"table-avatar")}${p.id===g.dealerId?"Ажил · ":""}${escapeHtml(p.name)}</span></div><div class="score-chip-value">${gp.score}</div>`;compact.appendChild(chip)});
+    const expanded=state.ui?.scoreboardExpanded!==false;$("scoreboardFull").classList.toggle("hidden",!expanded);$("scoreboardCompact").classList.toggle("hidden",expanded);$("scoreToggleBtn").textContent=expanded?"Хураах":"Хүснэгтээр харах";syncScoreboardBodyClass()
+  }
+
+  function gameHistoryTableHtml(g,markWinner){
+    const cols=state.players.slice();
+    const rows=(g.roundHistory||[]).map((r,idx)=>{
+      const isFinal=idx===g.roundHistory.length-1;
+      return `<tr><td>${escapeHtml(playerById(r.dealerId)?.name||"—")}</td><td class="num">${r.round}</td>${cols.map(p=>{const v=(markWinner&&isFinal&&p.id===g.winnerId)?"★":(r.results?.[p.id]?.endScore ?? "—");return `<td class="num">${v}</td>`}).join("")}</tr>`;
+    }).join("");
+    return `<table class="scoreboard-table"><thead><tr><th>Ажил</th><th>Ээлж</th>${cols.map(p=>`<th><span class="table-player">${avatarHtml(p,"table-avatar")}${escapeHtml(p.name)}</span></th>`).join("")}</tr></thead><tbody>${rows||`<tr><td colspan="${cols.length+2}">—</td></tr>`}</tbody></table>`;
+  }
+
+  function submitRound(){
+    const g=state.currentGame,missing=state.players.filter(p=>!g.players[p.id].action);if(missing.length){g.notices=["Оноо оруулах дутуу: "+missing.map(p=>p.name).join(", ")];save();renderGame();return}
+    const played=state.players.filter(p=>g.players[p.id].action.type!=="fold");if(played.length<2){g.notices=[played.length===0?"Ээлж оруулах боломжгүй. Бүх тоглогч өнжсөн байна. Хамгийн багадаа 2 тоглогч тоглох ёстой.":`Ээлж оруулах боломжгүй. Зөвхөн ${played[0].name} тоглосон байна. Хамгийн багадаа 2 тоглогч тоглох ёстой.`];save();renderGame();return}
+    const total=pendingDeductionTotal();if(total>5){g.notices=[`Ээлж оруулах боломжгүй. Нийт хасагдах оноо ${total}; дээд хэмжээ 5.`];save();renderGame();return}
+    const results={},nextNotices=[],winners=[];state.players.forEach(p=>{const gp=g.players[p.id],a=gp.action,startScore=gp.score;let applied="";if(a.type==="fold"){gp.foldStreak+=1;applied="fold"}else if(a.type==="bust"){gp.score=startScore+state.settings.bustPoints;gp.foldStreak=0;applied="bust"}else{const k=a.value;if(state.settings.exactZero&&startScore-k<0){gp.score=startScore+state.settings.bustPoints;gp.foldStreak=0;applied="autoBust";nextNotices.push(`${p.name}: 0-ээс доош орох байсан тул “Үсэрсэн” гэж тооцож ${state.settings.bustPoints} оноо нэмэгдлээ.`)}else{gp.score=startScore-k;gp.foldStreak=0;applied="deduct"}}if(state.settings.exactZero?gp.score===0:gp.score<=0)winners.push(p.id);results[p.id]={startScore,action:a,applied,endScore:gp.score,foldStreak:gp.foldStreak};gp.action=null});
+    g.roundHistory.push({round:g.round,dealerId:g.dealerId,totalDeducted:total,results,at:new Date().toISOString()});playCashRegisterSfx();if(!winners.length){state.players.forEach(p=>{const gp=g.players[p.id];if(state.settings.maxThreeFolds&&gp.foldStreak>=3)nextNotices.push(`${p.name}: 3 удаа дараалан өнжсөн тул дараагийн ээлжид өнжих боломжгүй.`);if(state.settings.noFoldAtOne&&gp.score===1)nextNotices.push(`${p.name}: 1 оноотой болсон тул дараагийн ээлжид өнжих боломжгүй.`)});g.dealerId=nextSeatId(g.dealerId);g.round++;g.notices=[...new Set(nextNotices)];save();renderGame();return}g.notices=[...new Set(nextNotices)];if(winners.length===1)finalizeGame(winners[0]);else{g.pendingWinnerCandidates=winners;save();showWinnerModal(winners)}
+  }
+
+  function showWinnerModal(ids){const list=$("winnerCandidates");list.innerHTML="";ids.forEach(id=>{const p=playerById(id),b=document.createElement("button");b.className="btn primary";b.textContent=p.name;b.onclick=()=>{$("winnerModal").classList.add("hidden");finalizeGame(id)};list.appendChild(b)});$("winnerModal").classList.remove("hidden")}
+  function finalizeGame(winnerId){
+    const g=state.currentGame;g.finished=true;g.winnerId=winnerId;g.pendingWinnerCandidates=[];
+    const charges={};let winnerGain=0;
+    state.players.forEach(p=>{
+      if(p.id===winnerId){charges[p.id]=0;return}
+      const remaining=Math.max(0,Number(g.players[p.id]?.score)||0);
+      const charge=state.settings.wholeBid?g.bid:remaining*g.bid;
+      charges[p.id]=charge;state.balances[p.id]-=charge;winnerGain+=charge;
+    });
+    state.balances[winnerId]+=winnerGain;charges[winnerId]=-winnerGain;
+    state.wins[winnerId]=(state.wins[winnerId]||0)+1;
+    if(g.phase==="initial")state.initialWins[winnerId]=(state.initialWins[winnerId]||0)+1;
+    if(g.phase==="extra"&&!state.usedExtraDealerIds.includes(g.startingDealerId))state.usedExtraDealerIds.push(g.startingDealerId);
+    state.history.push({number:g.number,phase:g.phase,phaseNumber:g.phaseNumber,bid:g.bid,bidMode:state.settings.wholeBid?"whole":"perPoint",startingDealerId:g.startingDealerId,dealerId:g.startingDealerId,winnerId,charges,endedAt:new Date().toISOString(),rounds:g.roundHistory});
+    save();renderBetween()
+  }
+
+  function renderBalances(){const wrap=$("balances");wrap.innerHTML='<div class="balance-list"></div>';const list=wrap.firstElementChild;state.players.forEach(p=>{const v=state.balances[p.id]||0,cls=v>0?"positive":v<0?"negative":"zero",sign=v>0?"+":"",row=document.createElement("div");row.className="balance-row";row.innerHTML=`<strong>${escapeHtml(p.name)}</strong><span class="${cls}">${sign}${money(v)}</span>`;list.appendChild(row)})}
+  function initialGamesComplete(){return phaseHistoryCount("initial")>=state.initialGameLimit}
+  function computeExtraEligibility(){state.extraEligibleDealerIds=state.players.filter(p=>(state.initialWins[p.id]||0)===0).map(p=>p.id);state.extraGameLimit=state.extraEligibleDealerIds.length}
+  function remainingExtraDealerIds(){return state.extraEligibleDealerIds.filter(id=>!state.usedExtraDealerIds.includes(id))}
+
+  function renderBetween(){
+    showView("betweenView");const g=state.currentGame,w=playerById(g.winnerId);$("endedGameLabel").textContent=g.phase==="extra"?"Боолтын гараа дууслаа":"Гараа дууслаа";$("winnerTitle").textContent=`🏆 ${w.name} хожлоо`;$("gameResultText").textContent=`${g.phase==="extra"?`Боолт ${g.phaseNumber}`:`${g.phaseNumber}-р гараа`} · ${g.round} ээлж · Бооцоо ${money(g.bid)}${state.settings.wholeBid?" / бүхэл":" / оноо"}`;$("endedGameTable").innerHTML=gameHistoryTableHtml(g,true);renderBalances();const card=$("nextActionCard");
+    if(g.phase==="initial"&&!initialGamesComplete()){
+      card.innerHTML=`<h2 class="section-title">Дараагийн гараа</h2><div class="notice ok">Ажил: <strong>${escapeHtml(w.name)}</strong> — өмнөх гарааны ялагч</div><button id="nextInitialGameBtn" class="btn primary large full">Дараагийн гараа эхлүүлэх</button>`;$("nextInitialGameBtn").onclick=()=>{startNewGame({phase:"initial",bid:state.initialBid,dealerId:g.winnerId});renderGame()};return
+    }
+    if(g.phase==="initial"&&initialGamesComplete()){
+      computeExtraEligibility();save();const eligible=state.extraEligibleDealerIds.map(id=>playerById(id).name);
+      if(!state.settings.extraGames){card.innerHTML=`<h2 class="section-title">Үндсэн гараанууд дууслаа</h2><div class="notice ok">${state.initialGameLimit} үндсэн гараа бүрэн тоглогдлоо.</div><button id="finishNowBtn" class="btn primary large full">Нийт тоглолт дуусгах</button>`;$("finishNowBtn").onclick=requestFinish;return}
+      if(!eligible.length){card.innerHTML=`<h2 class="section-title">Үндсэн гараанууд дууслаа</h2><div class="notice ok">0 хожилтой тоглогч байхгүй тул Боолт тоглох гараа байхгүй.</div><button id="finishNowBtn" class="btn primary large full">Нийт тоглолт дуусгах</button>`;$("finishNowBtn").onclick=requestFinish;return}
+      card.innerHTML=`<h2 class="section-title">Боолт тоглох уу?</h2><div class="notice warn">0 хожилтой: <strong>${escapeHtml(eligible.join(", "))}</strong><br>Хамгийн ихдээ <strong>${state.extraGameLimit}</strong> Боолт тоглож болно.</div><div class="field"><label>Боолтын бооцоо</label><input id="extraBidInput" type="number" inputmode="numeric" min="1" step="1" value="${state.initialBid*2}"></div><div class="field"><label>Эхний Боолтын ажил</label><select id="extraDealerSelect">${state.extraEligibleDealerIds.map(id=>`<option value="${id}">${escapeHtml(playerById(id).name)}</option>`).join("")}</select></div><div class="footer-actions"><button id="finishNowBtn" class="btn ghost">Боолтгүй дуусгах</button><button id="startExtraBtn" class="btn primary">Боолт эхлүүлэх</button></div>`;$("finishNowBtn").onclick=requestFinish;$("startExtraBtn").onclick=()=>startExtraFromControls();return
+    }
+    if(g.phase==="extra"){
+      const remaining=remainingExtraDealerIds();if(!remaining.length||phaseHistoryCount("extra")>=state.extraGameLimit){card.innerHTML=`<h2 class="section-title">Боолт дууслаа</h2><div class="notice ok">Зөвшөөрөгдсөн ${state.extraGameLimit} Боолт гараа дууссан.</div><button id="finishNowBtn" class="btn primary large full">Нийт тоглолт дуусгах</button>`;$("finishNowBtn").onclick=requestFinish;return}
+      card.innerHTML=`<h2 class="section-title">Дараагийн Боолт</h2><div class="small" style="margin-bottom:10px">Үлдсэн Боолт: ${state.extraGameLimit-phaseHistoryCount("extra")}</div><div class="field"><label>Боолтын бооцоо</label><input id="extraBidInput" type="number" inputmode="numeric" min="1" step="1" value="${state.initialBid*2}"></div><div class="field"><label>Ажил</label><select id="extraDealerSelect">${remaining.map(id=>`<option value="${id}">${escapeHtml(playerById(id).name)}</option>`).join("")}</select></div><div class="footer-actions"><button id="finishNowBtn" class="btn ghost">Нийт тоглолт дуусгах</button><button id="startExtraBtn" class="btn primary">Дараагийн Боолт</button></div>`;$("finishNowBtn").onclick=requestFinish;$("startExtraBtn").onclick=()=>startExtraFromControls();
+    }
+  }
+
+  function startExtraFromControls(){const bid=Math.floor(Number($("extraBidInput").value)),dealerId=$("extraDealerSelect").value;if(!Number.isFinite(bid)||bid<=0){alert("Бооцоог 0-ээс их бүхэл тоогоор оруулна уу.");return}if(!remainingExtraDealerIds().includes(dealerId)){alert("Энэ тоглогч Боолтын ажлаар аль хэдийн орсон эсвэл сонгох боломжгүй байна.");return}startNewGame({phase:"extra",bid,dealerId});renderGame()}
+
+  function requestFinish(){showConfirm("Нийт тоглолт дуусгах уу?","Баталгаажуулсны дараа зөвхөн дууссан гараануудын өрийг хооронд нь тэглэж, эцсийн төлбөрийг тооцно.",()=>finishSession(false),true)}
+  function requestTerminate(){const completed=state.history.length,unfinished=state.currentGame&&!state.currentGame.finished;const text=unfinished?`Одоогийн гараа дуусаагүй тул тооцоонд орохгүй. Зөвхөн өмнө дууссан ${completed} гарааны төлбөр тооцогдоно.`:`Дууссан ${completed} гарааны төлбөрөөр нийт тоглолтыг хаана.`;showConfirm("Нийт тоглолтыг шууд дуусгах уу?",text,()=>finishSession(true),true)}
+  function finishSession(terminatedEarly=false){state.terminatedEarly=!!(terminatedEarly&&state.currentGame&&!state.currentGame.finished);state.settlement=state.history.length?solveMinimumTransfers():[];state.sessionFinished=true;state.finishedAt=new Date().toISOString();save();renderSettlement()}
+  function solveMinimumTransfers(){const items=state.players.map(p=>({id:p.id,amount:Math.round(state.balances[p.id]||0)})).filter(x=>x.amount!==0),memo=new Map();const key=a=>a.map(x=>x.amount).join(",");function rec(arr){let i=0;while(i<arr.length&&arr[i].amount===0)i++;if(i===arr.length)return[];const k=key(arr);if(memo.has(k))return memo.get(k);let best=null,a=arr[i];for(let j=i+1;j<arr.length;j++){const b=arr[j];if(!a.amount||!b.amount||Math.sign(a.amount)===Math.sign(b.amount))continue;const amount=Math.min(Math.abs(a.amount),Math.abs(b.amount)),next=arr.map(x=>({...x}));let fromId,toId;if(next[i].amount<0){fromId=next[i].id;toId=next[j].id;next[i].amount+=amount;next[j].amount-=amount}else{fromId=next[j].id;toId=next[i].id;next[j].amount+=amount;next[i].amount-=amount}const cand=[{fromId,toId,amount},...rec(next)];if(!best||cand.length<best.length)best=cand;if(Math.abs(a.amount)===Math.abs(b.amount))break}const res=best||[];memo.set(k,res);return res}return rec(items.map(x=>({...x})))}
+
+  function renderSettlement(){showView("settlementView");const initialCount=phaseHistoryCount("initial"),extraCount=phaseHistoryCount("extra");$("sessionStats").innerHTML=`<div class="notice ok">Үндсэн гараа: <strong>${initialCount}</strong>${extraCount?` · Боолт: <strong>${extraCount}</strong>`:""} · Нийт дууссан гараа: <strong>${state.history.length}</strong></div>${state.terminatedEarly?'<div class="notice warn">Дуусаагүй гараа төлбөрийн тооцоонд ороогүй.</div>':''}${state.history.length===0?'<div class="notice warn">Төлбөр тооцох дууссан гараа байхгүй.</div>':''}<div class="wins-list" id="winsList"></div>`;const wl=$("winsList");state.players.slice().sort((a,b)=>(state.wins[b.id]||0)-(state.wins[a.id]||0)).forEach(p=>{const row=document.createElement("div");row.className="wins-row";row.innerHTML=`<span>${escapeHtml(p.name)}</span><strong>${state.wins[p.id]||0} хожил</strong>`;wl.appendChild(row)});const set=$("settlements");if(!state.settlement.length)set.innerHTML='<div class="notice ok">Төлбөр байхгүй. Бүх үлдэгдэл тэг байна.</div>';else{set.innerHTML='<div class="settlement-list" id="settlementList"></div>';const sl=$("settlementList");state.settlement.forEach(t=>{const row=document.createElement("div");row.className="settlement-row";row.innerHTML=`<span><strong>${escapeHtml(playerById(t.fromId).name)}</strong> → <strong>${escapeHtml(playerById(t.toId).name)}</strong></span><strong>${money(t.amount)}</strong>`;sl.appendChild(row)})}$("summaryText").textContent=buildSummaryText()}
+  function buildSummaryText(){const initialCount=phaseHistoryCount("initial"),extraCount=phaseHistoryCount("extra"),lines=["🃏 Муушигийн тоглолтын тооцоо","",`Үндсэн гараа: ${initialCount}`];if(extraCount)lines.push(`Боолт: ${extraCount}`);lines.push(`Нийт гараа: ${state.history.length}`,"","🏆 Хожил:");state.players.slice().sort((a,b)=>(state.wins[b.id]||0)-(state.wins[a.id]||0)).forEach(p=>lines.push(`• ${p.name} — ${state.wins[p.id]||0}`));lines.push("","💸 Эцсийн төлбөр:");if(!state.settlement.length)lines.push("• Төлбөр байхгүй.");else{state.settlement.forEach(t=>lines.push(`• ${playerById(t.fromId).name} → ${playerById(t.toId).name}: ${money(t.amount)}`));lines.push("",`Нийт ${state.settlement.length} шилжүүлэг.`)}return lines.join("\n")}
+  async function copySummary(){const text=buildSummaryText();try{await navigator.clipboard.writeText(text);$("copySummaryBtn").textContent="Хуулсан ✓";setTimeout(()=>$("copySummaryBtn").textContent="Текст хуулах",1400)}catch{const ta=document.createElement("textarea");ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();alert("Текст хууллаа.")}}
+
+  function showConfirm(title,text,action,danger=true){$("confirmTitle").textContent=title;$("confirmText").textContent=text;confirmAction=action;$("confirmOk").textContent=action?"Тийм":"Ойлголоо";$("confirmOk").className=action&&danger?"btn danger":"btn primary";$("confirmCancel").classList.toggle("hidden",!action);$("confirmModal").classList.remove("hidden")}
+  function resetSession(){showConfirm("Шинэ тоглолт эхлүүлэх үү?","Одоогийн хадгалсан тоглолтын мэдээлэл устна.",()=>{localStorage.removeItem(STORAGE_KEY);state=null;setupNames=["","","",""];setupPhotos=[null,null,null,null];location.reload()},true)}
+
+  function renderEditNamesRows(){const list=$("editNamesList");list.innerHTML="";state.players.forEach((p,i)=>{const preview={...p,photo:editPhotoDraft[p.id]??p.photo??null},row=document.createElement("div");row.className="player-input-row";row.innerHTML=`${avatarHtml(preview,"setup-avatar")}<div><label>${i+1}-р байрлал</label><input type="text" maxlength="30" value="${escapeHtml(p.name)}" data-edit-name="${p.id}"></div><label class="btn ghost slim photo-label">📷 Зураг<input type="file" accept="image/*" capture="user" data-edit-photo="${p.id}"></label><span></span>`;list.appendChild(row)});list.querySelectorAll("[data-edit-photo]").forEach(inp=>inp.addEventListener("change",async e=>{const currentNames={};list.querySelectorAll("[data-edit-name]").forEach(x=>currentNames[x.dataset.editName]=x.value);const id=e.target.dataset.editPhoto,file=e.target.files?.[0];if(!file)return;try{editPhotoDraft[id]=await compressPhoto(file);renderEditNamesRows();Object.entries(currentNames).forEach(([pid,name])=>{const el=list.querySelector(`[data-edit-name="${pid}"]`);if(el)el.value=name})}catch{alert("Зургийг боловсруулахад алдаа гарлаа.")}}))}
+  function openEditNames(){editPhotoDraft={};state.players.forEach(p=>editPhotoDraft[p.id]=p.photo||null);renderEditNamesRows();$("editNamesError").classList.add("hidden");$("editNamesModal").classList.remove("hidden")}
+  function saveEditedNames(){const values=[...document.querySelectorAll("[data-edit-name]")].map(el=>({id:el.dataset.editName,name:el.value.trim()})),names=values.map(x=>x.name),lower=names.map(n=>n.toLocaleLowerCase("mn-MN"));if(names.some(n=>!n)||new Set(lower).size!==lower.length){$("editNamesError").textContent="Нэр хоосон эсвэл давхардсан байж болохгүй.";$("editNamesError").classList.remove("hidden");return}values.forEach(x=>{const p=playerById(x.id);p.name=x.name;p.photo=editPhotoDraft[x.id]||null});$("editNamesModal").classList.add("hidden");save();render()}
+
+  function updateBidLabel(){const whole=$("wholeBidCheck")?.checked;if($("bidLabel"))$("bidLabel").textContent=whole?"Үндсэн бүхэл бооцоо / хожигч бүрийн төлөх дүн":"Үндсэн бооцоо / 1 онооны үнэ"}
+  $("wholeBidCheck").addEventListener("change",updateBidLabel);updateBidLabel();
+  $("addPlayerBtn").onclick=()=>{if(setupNames.length>=10)return alert("Хамгийн ихдээ 10 тоглогч оруулна.");setupNames.push("");setupPhotos.push(null);renderSetup()};$("startSessionBtn").onclick=startSession;$("submitRoundBtn").onclick=submitRound;$("scoreToggleBtn").onclick=()=>{state.ui.scoreboardExpanded=!(state.ui.scoreboardExpanded!==false);save();renderScoreboard(state.players)};$("terminateSessionBtn").onclick=requestTerminate;$("copySummaryBtn").onclick=copySummary;$("newSessionBtn").onclick=resetSession;$("editNamesBtn").onclick=openEditNames;$("editNamesCancel").onclick=()=>$("editNamesModal").classList.add("hidden");$("editNamesSave").onclick=saveEditedNames;$("confirmCancel").onclick=()=>{$("confirmModal").classList.add("hidden");confirmAction=null};$("confirmOk").onclick=()=>{const fn=confirmAction;$("confirmModal").classList.add("hidden");confirmAction=null;if(fn)fn()};
+  window.addEventListener("storage",e=>{if(e.key===STORAGE_KEY&&e.newValue){try{state=migrate(JSON.parse(e.newValue));render()}catch{}}});
+  if(load())render();else renderSetup();
+})();
+</script>
+</body>
+</html>
